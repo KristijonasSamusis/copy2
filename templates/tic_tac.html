@@ -25,17 +25,21 @@ width: 80vh;
 }
 
 .box {
-background-color: #FFF;
-border-radius: 3px;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-display: flex;
-justify-content: center;
-align-items: center;
-cursor: pointer;
-user-select: none;
-transition: background-color 0.3s ease;
-width: 100%; /* Ensure box takes full width of its container */
-height: 100%; /* Ensure box takes full height of its container */
+    background-color: #FFF; /* Light background to make the box visible */
+    border: 1px solid #E0E0E0; /* Subtle border to define the boxes */
+    border-radius: 0px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Ensure box takes full width of its container */
+    height: 100%; /* Ensure box takes full height of its container */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .box:hover {
@@ -105,21 +109,49 @@ for (let i = 0; i < 320; i++) {
             })
         })
 
-                function addPlayerLetter(element, state=playerLetter) {
-            element.innerHTML = `<p class="player-letter ${state}" >${state}</p>`;
-            element.setAttribute("player", state)
+function addPlayerLetter(element, state=playerLetter) {
+    // Clear any existing content
+    element.innerHTML = '';
+    element.setAttribute("player", state);
 
-            const playerElement = element.children[0];
-            // Map each character in state string to a CSS class.
-            // These classes should be defined in your CSS.
-            if (state.includes("H")) playerElement.classList.add('horizontal');
-            if (state.includes("V")) playerElement.classList.add('vertical');
-            if (state.includes("R")) playerElement.classList.add('right-diagonal');
-            if (state.includes("L")) playerElement.classList.add('left-diagonal');
-            setTimeout(() => {
-               playerElement.classList.add('active');
-            }, 1);
-          }
+    // Define the base URL for images
+    const baseUrl = '/static/tic_tac/images/';
+
+    // Initialize an array to hold the URLs of the images to be added
+    let imageUrls = [];
+
+    // Loop through each character in the state string and add the corresponding image URL
+    for (let char of state) {
+        switch (char) {
+            case 'O':
+                imageUrls.push(`url('${baseUrl}O.png')`);
+                break;
+            case 'X':
+                imageUrls.push(`url('${baseUrl}X.png')`);
+                break;
+            case 'H':
+                imageUrls.push(`url('${baseUrl}H.png')`);
+                break;
+            case 'V':
+                imageUrls.push(`url('${baseUrl}V.png')`);
+                break;
+            case 'L':
+                imageUrls.push(`url('${baseUrl}L.png')`);
+                break;
+            case 'R':
+                imageUrls.push(`url('${baseUrl}R.png')`);
+                break;
+            // Add cases for other characters as needed
+        }
+    }
+
+    // Combine the URLs to set as the background image, allowing multiple backgrounds
+    element.style.backgroundImage = imageUrls.join(', ');
+    // Optional: Adjust these properties as needed to fit your design
+    element.style.backgroundSize = 'contain';
+    element.style.backgroundRepeat = 'no-repeat';
+    element.style.backgroundPosition = 'center';
+}
 
         function resetBoard(){
             Array.from(boxes).forEach(elm => {
