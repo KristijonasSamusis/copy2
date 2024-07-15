@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <style>
+
     .details p {
 display: block;
 }
@@ -104,13 +105,21 @@ for (let i = 0; i < 320; i++) {
             })
         })
 
-        function addPlayerLetter(element, player=playerLetter) {
-            element.innerHTML = `<p class="player-letter" >${player}</p>`;
-            element.setAttribute("player", player)
+                function addPlayerLetter(element, state=playerLetter) {
+            element.innerHTML = `<p class="player-letter ${state}" >${state}</p>`;
+            element.setAttribute("player", state)
+
+            const playerElement = element.children[0];
+            // Map each character in state string to a CSS class.
+            // These classes should be defined in your CSS.
+            if (state.includes("H")) playerElement.classList.add('horizontal');
+            if (state.includes("V")) playerElement.classList.add('vertical');
+            if (state.includes("R")) playerElement.classList.add('right-diagonal');
+            if (state.includes("L")) playerElement.classList.add('left-diagonal');
             setTimeout(() => {
-                element.children[0].classList.add("active")
+               playerElement.classList.add('active');
             }, 1);
-        }
+          }
 
         function resetBoard(){
             Array.from(boxes).forEach(elm => {
