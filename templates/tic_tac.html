@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+    .details p {
+display: block;
+}
+    body {
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+width: 100vh;
+background-color: #F5F5F5;
+}
+
+.container {
+display: grid;
+grid-template-columns: repeat(20, 1fr);
+grid-template-rows: repeat(16, 1fr);
+gap: 1px;
+height: 60vh;
+width: 80vh;
+}
+
+.box {
+background-color: #FFF;
+border-radius: 3px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+user-select: none;
+transition: background-color 0.3s ease;
+width: 100%; /* Ensure box takes full width of its container */
+height: 100%; /* Ensure box takes full height of its container */
+}
+
+.box:hover {
+background-color: #F5F5F5;
+}
+
+.player-letter {
+    font-family: Arial; /* Change to your preferred font */
+    font-size: 1.5vh; /* Adjust based on your preference and box size */
+    line-height: 0.5; /* Adjust line height to control effect on column height */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.player-letter.active {
+opacity: 1;
+}
+</style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>Room {{room.id}} | Tic Tac Toe</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="details">
+            <p>{{name}} (You)</p>
+            <p>{{room.id}} (Room ID)</p>
+            <p id="opponent-txt"> Opponent (waiting to join)</p>
+        </div>
+        <div class="container">
+ {% for num in "x"|rjust:"320" %}
+    <div boxIndex="{{ forloop.counter0 }}" player="" class="box child box-{{ forloop.counter }}"></div>
+{% endfor %}
+        </div>
+        <div class="details">
+            <p id="turn"></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+let board = {};
+for (let i = 0; i < 320; i++) {
+  board[i] = '';
+}
+        let myTurn = false
+        let playerLetter = ""
+        const opponentTxtElm = document.getElementById("opponent-txt")
+        const turnElm = document.getElementById("turn")
+
+        const boxes = document.getElementsByClassName("box")
+        Array.from(boxes).forEach((elm, i) => {
+            elm.addEventListener("click", e => {
+                if(myTurn && elm.innerHTML == "" && elm.getAttribute("player") == ""){
+                    board[i] = playerLetter
+                    ws.send(JSON.stringify({
+                        event: 'board_data_send',
+                        board: board,
+                    }))
+                    addPlayerLetter(elm)
+                myTurn = false
+                }
+            })
+        })
+
+        function addPlayerLetter(element, player=playerLetter) {
+            element.innerHTML = `<p class="player-letter" >${player}</p>`;
+            element.setAttribute("player", player)
+            setTimeout(() => {
+                element.children[0].classList.add("active")
+            }, 1);
+        }
+
+        function resetBoard(){
+            Array.from(boxes).forEach(elm => {
+                elm.innerHTML = ``
+                elm.setAttribute("player", "")
+            })
+        }
+
+        function updateBoard(board_data){
+            Array.from(boxes).forEach((elm,i ) => {
+                if(board_data[i] != "" && !elm.getAttribute("player")){
+                    addPlayerLetter(elm, board_data[i])
+                }
+            })
+        }
+
+        const ws = new WebSocket("ws://127.0.0.1:8000/ws/tic_tac/{{room.id}}/")
+
+        ws.onopen = e => {
+            console.log(e)
+        }
+
+        ws.onmessage = e => {
+            console.log(e)
+            const data = JSON.parse(e.data)
+            if(data.event == "show_error"){
+                Swal.fire({
+                  icon: "error",
+                  title: data.error,
+                }).then( e => window.location = "/")
+            }
+            else if(data.event == "game_start"){
+                board = data.board
+                myTurn = data.myTurn
+                playerLetter = data.myTurn? "X": "O"
+                resetBoard()
+                turnElm.innerHTML = data.myTurn? "Your Turn": "Opponent's Turn"
+                opponentTxtElm.innerHTML = "Opponent Joined"
+                setTimeout(() => {
+                Swal.close()
+                }, 500);
+            }
+            else if(data.event == "board_data_send"){
+                board = data.board
+                myTurn = data.myTurn
+                updateBoard(board)
+                turnElm.innerHTML = data.myTurn? "Your Turn": "Opponent's Turn"
+            }
+            else if(data.event == "won"){
+                board = data.board
+                myTurn = data.myTurn
+                updateBoard(board)
+                turnElm.innerHTML = data.winner == playerLetter? "You Won": "You Lost"
+                setTimeout(() => {
+
+                    Swal.fire({
+                      icon: data.winner == playerLetter ? "success": "error",
+                      title: data.winner == playerLetter ? "You Won": "You Lost",
+                      confirmButtonText: "Play Again"
+                    }).then(e => ws.send(JSON.stringify({event: 'restart',})))
+                }, 400);
+            }
+            else if(data.event == "draw"){
+                board = data.board
+                myTurn = data.myTurn
+                updateBoard(board)
+                turnElm.innerHTML = "Draw"
+                setTimeout(() => {
+
+                    Swal.fire({
+                      icon: "info",
+                      title: "Draw",
+                      confirmButtonText: "Play Again"
+                    }).then(e => ws.send(JSON.stringify({event: 'restart',})))
+                }, 400);
+            }
+            else if(data.event == "opponent_left"){
+                board = data.board
+                myTurn = data.myTurn
+                resetBoard()
+                turnElm.innerHTML = "Opponent Left"
+                opponentTxtElm.innerHTML = "Opponent (waiting to join)"
+
+                setTimeout(() => {
+                    Swal.fire({
+                      icon: "info",
+                      title: "Opponent Left",
+                      confirmButtonText: "Ok"
+                    })
+                }, 400);
+            }
+        }
+
+    </script>
+</body>
+</html>
