@@ -44,15 +44,16 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, content, **kwargs):
         print(content)
         if content['event'] == "board_data_send":
-
-            winner = check_win(content['board'])
-            if winner:
+            self.clicked_key = content.get('clickedKey')
+            self.letter = content.get('letter')
+            self.score, board = check_win(content['board'], self.clicked_key, self.letter)
+            if self.score > 0:
                 return await self.channel_layer.group_send(self.group_name, {
                     "type": "game_data_send",
                     "data": {
                         "event": "won",
-                        "board": content['board'],
-                        "winner": winner,
+                        "board": board,
+                        "winner": self.letter,
                         "myTurn": False,
                     }
                 })
@@ -72,7 +73,7 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                         "type": "game_data_send",
                         "data": {
                             "event": "board_data_send",
-                            "board": content['board'],
+                            "board": board,
                             "myTurn": False if self.channel_name == channel_name else True
                         }
                     })
@@ -85,7 +86,7 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                 final_group = [first_player, tmp_group[0]]
                 for i, channel_name in enumerate(final_group):
                     await self.channel_layer.send(channel_name, {
-                        "type": "game_data.send",
+                        "type": "game_data_send",
                         "data": {
                             "event": "game_start",
                             "board": self.board,

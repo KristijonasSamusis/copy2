@@ -86,8 +86,10 @@ opacity: 1;
 
     <script>
 let board = {};
+
 for (let i = 0; i < 320; i++) {
   board[i] = '';
+
 }
         let myTurn = false
         let playerLetter = ""
@@ -102,6 +104,9 @@ for (let i = 0; i < 320; i++) {
                     ws.send(JSON.stringify({
                         event: 'board_data_send',
                         board: board,
+                        clickedKey: i,
+                        letter: playerLetter,
+
                     }))
                     addPlayerLetter(elm)
                 myTurn = false
@@ -145,6 +150,7 @@ function addPlayerLetter(element, state=playerLetter) {
         }
     }
 
+
     // Combine the URLs to set as the background image, allowing multiple backgrounds
     element.style.backgroundImage = imageUrls.join(', ');
     // Optional: Adjust these properties as needed to fit your design
@@ -160,12 +166,15 @@ function addPlayerLetter(element, state=playerLetter) {
             })
         }
 
-        function updateBoard(board_data){
-            Array.from(boxes).forEach((elm,i ) => {
-                if(board_data[i] != "" && !elm.getAttribute("player")){
-                    addPlayerLetter(elm, board_data[i])
+        function updateBoard(board_data) {
+            // Iterate over each box element
+            Array.from(boxes).forEach((elm, i) => {
+                const state = board_data[i]; // Get the state for this box from board_data
+                // Check if the state has changed and the box does not already have a player attribute set
+                if (state !== "" && elm.getAttribute("player") !== state) {
+                    addPlayerLetter(elm, state); // Update the box with the new state
                 }
-            })
+            });
         }
 
         const ws = new WebSocket("ws://127.0.0.1:8000/ws/tic_tac/{{room.id}}/")
