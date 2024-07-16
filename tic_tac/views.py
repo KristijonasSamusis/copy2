@@ -1,6 +1,8 @@
 from django.shortcuts import render, HttpResponse, redirect
 from .models import Room
 from django.contrib import messages
+import re
+
 
 # Create your views here.
 def index(request):
@@ -9,6 +11,12 @@ def index(request):
     elif request.method == "POST":
         room_id = request.POST.get("room-id", None)
         player_name = request.POST.get("player-name", "Unknown Player")
+        if not re.match("^[a-zA-Z0-9]+$", player_name):
+            messages.error(request, "Name should contain only alphabets and numbers.")
+            return redirect("/")
+        if player_name == "":
+            player_name = "Guest"
+
         if(room_id):
             try:
                 room = Room.objects.get(id=room_id)
