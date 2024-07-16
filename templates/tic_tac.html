@@ -68,9 +68,12 @@ opacity: 1;
 <body>
     <div class="wrapper">
         <div class="details">
-            <p>{{name}} (You)</p>
-            <p>{{room.id}} (Room ID)</p>
+            <p>{{name}}</p>
+            <p>Room: {{room.id}} </p>
+            <p id="playerXScore">Player X Score: 0</p>
+            <p id="playerOScore">Player O Score: 0</p>
             <p id="opponent-txt"> Opponent (waiting to join)</p>
+
         </div>
         <div class="container">
  {% for num in "x"|rjust:"320" %}
@@ -86,7 +89,8 @@ opacity: 1;
 
     <script>
 let board = {};
-
+let playerXScore = 0;
+let playerOScore = 0;
 for (let i = 0; i < 320; i++) {
   board[i] = '';
 
@@ -109,6 +113,7 @@ for (let i = 0; i < 320; i++) {
 
                     }))
                     addPlayerLetter(elm)
+
                 myTurn = false
                 }
             })
@@ -209,19 +214,19 @@ function addPlayerLetter(element, state=playerLetter) {
                 updateBoard(board)
                 turnElm.innerHTML = data.myTurn? "Your Turn": "Opponent's Turn"
             }
-            else if(data.event == "won"){
+            else if(data.event == "score"){
                 board = data.board
                 myTurn = data.myTurn
+                score = data.score
                 updateBoard(board)
-                turnElm.innerHTML = data.winner == playerLetter? "You Won": "You Lost"
-                setTimeout(() => {
-
-                    Swal.fire({
-                      icon: data.winner == playerLetter ? "success": "error",
-                      title: data.winner == playerLetter ? "You Won": "You Lost",
-                      confirmButtonText: "Play Again"
-                    }).then(e => ws.send(JSON.stringify({event: 'restart',})))
-                }, 400);
+                turnElm.innerHTML = data.myTurn? "Your Turn": "Opponent's Turn"
+                if(data.player == "X") {
+                    playerXScore = playerXScore + score;
+                    document.getElementById("playerXScore").innerText = `Player X Score: ${playerXScore}`;
+                } else if(data.player == "O") {
+                    playerOScore = playerOScore + score;
+                    document.getElementById("playerOScore").innerText = `Player O Score: ${playerOScore}`;
+    }
             }
             else if(data.event == "draw"){
                 board = data.board

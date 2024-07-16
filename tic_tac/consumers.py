@@ -48,21 +48,24 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
             self.letter = content.get('letter')
             self.score, board = check_win(content['board'], self.clicked_key, self.letter)
             if self.score > 0:
-                return await self.channel_layer.group_send(self.group_name, {
-                    "type": "game_data_send",
-                    "data": {
-                        "event": "won",
-                        "board": board,
-                        "winner": self.letter,
-                        "myTurn": False,
-                    }
-                })
+                for channel_name in self.channel_layer.groups[self.group_name]:
+                    await self.channel_layer.send(channel_name, {
+                        "type": "game_data_send",
+                        "data": {
+                            "event": "score",
+                            "score": self.score,
+                            "board": board,
+                            "player": self.letter,
+                            "myTurn": False if self.channel_name == channel_name else True
+                        }
+                    })
             elif is_draw(content['board']):
                 return await self.channel_layer.group_send(self.group_name, {
                     "type": "game_data_send",
                     "data": {
                         "event": "draw",
                         "board": content['board'],
+                        "player": self.letter,
                         "myTurn": False,
                     }
                 })

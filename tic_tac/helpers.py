@@ -140,7 +140,8 @@ def check_win(board, clicked_key, letter):
             board_back[i*20 + j] = board[i][j]
 
     score = score_horizontal + score_vertical + score_slash + score_backslash
-    return 0, board_back
+    print(score)
+    return score, board_back
 
 
 
