@@ -33,6 +33,7 @@ def index(request):
 def tic_tac(request, id=None, name=None):
     try:
         room = Room.objects.get(id=id)
+        request.session['name'] = name
         return render(request, "tic_tac.html", {"room": room, "name": name})
     except Room.DoesNotExist:
         messages.error(request, "Room does not exist!!!")

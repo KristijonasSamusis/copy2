@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <style>
 
 body {
@@ -42,9 +43,17 @@ width: 80vh;
 .box:hover {
 background-color: #F5F5F5;
 }
+p {
+    font-family: Courier New;
+    font-weight: bold;
+    font-size: clamp(0rem, 2vw, 0.8rem); /* Adjusts the font size based on the width of the viewport */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 .player-letter {
-    font-family: Arial; /* Change to your preferred font */
+    font-family: Sans-serif
     font-size: 1.5vh; /* Adjust based on your preference and box size */
     line-height: 0.5; /* Adjust line height to control effect on column height */
     opacity: 0;
@@ -56,7 +65,8 @@ opacity: 1;
 }
 
 .info {
-    font-size: 2vw; /* Adjusts the font size based on the width of the viewport */
+    font-family: Sans-serif
+    font-size: clamp(0rem, 2vw, 0.8rem); /* Adjusts the font size based on the width of the viewport */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -66,9 +76,9 @@ opacity: 1;
     display: block;
 }
 .textcontainer {
-  display: flex;
-  justify-content: space-between;
-  width: 80vh;
+    display: flex;
+    justify-content: space-between;  /* Separate the boxes */
+    position: relative;  /* Establishes a new positioning context for .center */
 }
 
 .left {
@@ -76,10 +86,9 @@ opacity: 1;
 }
 
 .center {
-    display: flex;
-    justify-content: center;  /* center the item horizontally */
-    align-items: center;  /* center the item vertically */
-    flex-grow: 1;  /* allows the center element to take up the remaining space */
+    position: absolute;  /* Takes .center out of the document flow */
+    left: 50%;
+    transform: translateX(-50%);  /* Centers .center */
 }
 
 .right {
@@ -97,9 +106,9 @@ opacity: 1;
     <div class="wrapper">
 
             <p class="info textcontainer">
-                <span class="left">You: <img id="playerSymbol" src="" style="width: 1.5vw; height: 1.5vw;"></span>
+                <span class="left">You: <img id="playerSymbol" src="" align="center" style="width: 2vw; height: 2vw;"></span>
                 <span class="center" style="flex-grow: 1; text-align: center;">Room: {{room.id}}</span>
-                <span class="right" >Opponent</span>
+                <span class="right" ><img id="opponentSymbol" src="" align="center" style="width: 2vw; height: 2vw;">: Opponent</span>
             </p>
             <p class="info textcontainer">
                 <span class="left">{{name}} </span>
@@ -107,13 +116,13 @@ opacity: 1;
                 <span class="right" >Opponent</span>
             </p>
             <p class="info textcontainer">
-                <span class="left" id="playerXScore">Player X Score: 0</span>
+                <span class="left" id="playerXScore">X Score: 0</span>
                 <span class="center" id="turn" style="flex-grow: 1; text-align: center;"></span>
                 <span class="right" >score</span>
             </p>
 
             <p class="info textcontainer">
-                <span class="left" id="playerOScore">Player O Score: 0</span>
+                <span class="left" id="playerOScore">O Score: 0</span>
                 <span class="center" id="opponent-txt" style="flex-grow: 1; text-align: center;">Opponent (waiting to join)</span>
                 <span class="right" style="visibility: hidden;">{{name}}</span>
             </p>
@@ -245,12 +254,15 @@ function addPlayerLetter(element, state=playerLetter) {
             else if(data.event == "game_start"){
                 board = data.board;
                 myTurn = data.myTurn;
+
                 playerLetter = data.myTurn ? "X" : "O";
                 // Retrieve the img element
                 const playerSymbolImg = document.getElementById("playerSymbol");
+                const opponentSymbolImg = document.getElementById("opponentSymbol");
                 // Set the src attribute based on playerLetter
                 const baseUrl = '/static/tic_tac/images/'; // Ensure this path is correct
                 playerSymbolImg.src = `${baseUrl}P${playerLetter}.png`;
+                opponentSymbolImg.src = `${baseUrl}P${playerLetter == "X" ? "O" : "X"}.png`;
 
                 resetBoard();
                 turnElm.innerHTML = myTurn ? "Your Turn" : "Opponent's Turn";
@@ -273,10 +285,10 @@ function addPlayerLetter(element, state=playerLetter) {
                 turnElm.innerHTML = data.myTurn? "Your Turn": "Opponent's Turn"
                 if(data.player == "X") {
                     playerXScore = playerXScore + score;
-                    document.getElementById("playerXScore").innerText = `Player X Score: ${playerXScore}`;
+                    document.getElementById("playerXScore").innerText = `X Score: ${playerXScore}`;
                 } else if(data.player == "O") {
                     playerOScore = playerOScore + score;
-                    document.getElementById("playerOScore").innerText = `Player O Score: ${playerOScore}`;
+                    document.getElementById("playerOScore").innerText = `O Score: ${playerOScore}`;
     }
             }
             else if(data.event == "draw"){

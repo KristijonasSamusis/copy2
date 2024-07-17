@@ -9,8 +9,6 @@ def check_win(board, clicked_key, letter):
             yield lst[i:i + n]
 
     board = list(chunk_list(values_list, 20))
-    print(board)
-    print(click_row, click_column, letter, board[click_row][click_column])
 
     height = 16
     width = 20
@@ -26,7 +24,6 @@ def check_win(board, clicked_key, letter):
 
         horizontal_left += 1
         change += 1
-        # print(f"\n\n{line}   {column_change}\n\n")
     else:
         change = 1
     while (click_column + change in range(width) and
@@ -53,7 +50,6 @@ def check_win(board, clicked_key, letter):
 
         vertical_up += 1
         change += 1
-        # print(f"\n\n{line}   {column_change}\n\n")
     else:
         change = 1
     while (click_row + change in range(height) and
@@ -68,7 +64,6 @@ def check_win(board, clicked_key, letter):
                 board[click_row - vertical_up + i][click_column] = ("V" +
                         board[click_row - vertical_up + i][click_column])
             score_vertical = line_vertical - 4
-            print(score_vertical)
 
     # SLASH
 
@@ -84,7 +79,6 @@ def check_win(board, clicked_key, letter):
 
         slash_up += 1
         change += 1
-        # print(f"\n\n{line}   {column_change}\n\n")
     else:
         change = 1
     while (click_row + change in range(height) and click_column - change in range(
@@ -100,7 +94,6 @@ def check_win(board, clicked_key, letter):
                 board[click_row + slash_down - i][click_column - slash_down + i] = ("L" +
                         board[click_row + slash_down - i][click_column - slash_down + i])
             score_slash = line_slash - 4
-            print(score_slash)
 
     # SLASH
 
@@ -132,7 +125,6 @@ def check_win(board, clicked_key, letter):
                         board[click_row - backslash_down + i][
                             click_column - backslash_down + i])
             score_backslash = line_backslash - 4
-            print(score_backslash)
 
     board_back = {}
     for i in range(16):
@@ -140,7 +132,6 @@ def check_win(board, clicked_key, letter):
             board_back[i*20 + j] = board[i][j]
 
     score = score_horizontal + score_vertical + score_slash + score_backslash
-    print(score)
     return score, board_back
 
 

@@ -3,9 +3,11 @@ import contextlib
 import random
 from .helpers import check_win, is_draw
 
+
 class TicTacConsumer(AsyncJsonWebsocketConsumer):
 
     board = {i: '' for i in range(320)}
+    connected_players = {}
 
     async def connect(self):
         print(self.scope['url_route']['kwargs']['id'])
@@ -27,6 +29,8 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
         if len(self.channel_layer.groups[self.group_name]) == 2:
             tmp_group = list(self.channel_layer.groups[self.group_name])
             first_player = random.choice(tmp_group)
+            print("ZAIDEJAI!!!!!!!!!!!!!!!!!", tmp_group)
+
             tmp_group.remove(first_player)
             final_group = [first_player, tmp_group[0]]
             for i, channel_name in enumerate(final_group):
@@ -35,6 +39,7 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                     "data": {
                         "event": "game_start",
                         "board": self.board,
+                        "opponent": self.connected_players.get(channel_name),
                         "myTurn": True if i == 0 else False
                     }
                 })
@@ -42,7 +47,8 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
 
 
     async def receive_json(self, content, **kwargs):
-        print(content)
+        print("!!!!!!           ",content)
+
         if content['event'] == "board_data_send":
             self.clicked_key = content.get('clickedKey')
             self.letter = content.get('letter')
@@ -57,6 +63,7 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                             "board": board,
                             "player": self.letter,
                             "myTurn": False if self.channel_name == channel_name else True
+
                         }
                     })
             elif is_draw(content['board']):
@@ -86,6 +93,7 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                 tmp_group = list(self.channel_layer.groups[self.group_name])
                 first_player = random.choice(tmp_group)
                 tmp_group.remove(first_player)
+                print("ZAIDEJAI!!!!!!!!!!!!!!!!!", tmp_group)
                 final_group = [first_player, tmp_group[0]]
                 for i, channel_name in enumerate(final_group):
                     await self.channel_layer.send(channel_name, {
@@ -94,6 +102,8 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                             "event": "game_start",
                             "board": self.board,
                             "myTurn": True if i == 0 else False
+
+
                         }
                     })
     async def disconnect(self, code):
