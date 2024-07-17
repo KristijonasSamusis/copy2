@@ -2,23 +2,14 @@
 <html lang="en">
 <head>
 <style>
-    .info {
-        font-size: 2vw; /* Adjusts the font size based on the width of the viewport */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
 
-    .details p {
-display: block;
-}
-    body {
-display: flex;
-justify-content: center;
-align-items: center;
-height: 100vh;
-width: 100vh;
-background-color: #F5F5F5;
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vh;
+    background-color: #F5F5F5;
 }
 
 .container {
@@ -63,6 +54,37 @@ background-color: #F5F5F5;
 .player-letter.active {
 opacity: 1;
 }
+
+.info {
+    font-size: 2vw; /* Adjusts the font size based on the width of the viewport */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .details p {
+    display: block;
+}
+.textcontainer {
+  display: flex;
+  justify-content: space-between;
+  width: 80vh;
+}
+
+.left {
+  align-self: flex-start;
+}
+
+.center {
+    display: flex;
+    justify-content: center;  /* center the item horizontally */
+    align-items: center;  /* center the item vertically */
+    flex-grow: 1;  /* allows the center element to take up the remaining space */
+}
+
+.right {
+  align-self: flex-end;
+}
 </style>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -73,24 +95,34 @@ opacity: 1;
 </head>
 <body>
     <div class="wrapper">
-        <div class="details">
-            <p class="info">
-                <span>{{name}} <img id="playerSymbol" src="" style="width: 1.5vw; height: 1.5vw;"></span>
-                <span style="flex-grow: 1; text-align: center;">Room: {{room.id}}</span>
-                <span style="visibility: hidden;">{{name}}</span>
+
+            <p class="info textcontainer">
+                <span class="left">You: <img id="playerSymbol" src="" style="width: 1.5vw; height: 1.5vw;"></span>
+                <span class="center" style="flex-grow: 1; text-align: center;">Room: {{room.id}}</span>
+                <span class="right" >Opponent</span>
             </p>
-            <p class="info">
-                <span id="playerXScore">Player X Score: 0</span>
-                <span id="turn" style="flex-grow: 1; text-align: center;"></span>
-                <span style="visibility: hidden;">{{name}}</span>
+            <p class="info textcontainer">
+                <span class="left">{{name}} </span>
+                <span class="center" style="flex-grow: 1; text-align: center;">Room: {{room.id}}</span>
+                <span class="right" >Opponent</span>
+            </p>
+            <p class="info textcontainer">
+                <span class="left" id="playerXScore">Player X Score: 0</span>
+                <span class="center" id="turn" style="flex-grow: 1; text-align: center;"></span>
+                <span class="right" >score</span>
             </p>
 
-            <p class="info" id="playerOScore">Player O Score: 0</p>
+            <p class="info textcontainer">
+                <span class="left" id="playerOScore">Player O Score: 0</span>
+                <span class="center" id="opponent-txt" style="flex-grow: 1; text-align: center;">Opponent (waiting to join)</span>
+                <span class="right" style="visibility: hidden;">{{name}}</span>
+            </p>
 
-            <p class="info" id="opponent-txt"> Opponent (waiting to join)</p>
-            <p class="info" id="turn"></p>
 
-        </div>
+
+
+
+
         <div class="container">
  {% for num in "x"|rjust:"320" %}
     <div boxIndex="{{ forloop.counter0 }}" player="" class="box child box-{{ forloop.counter }}"></div>
