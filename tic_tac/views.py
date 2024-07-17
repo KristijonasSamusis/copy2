@@ -11,11 +11,12 @@ def index(request):
     elif request.method == "POST":
         room_id = request.POST.get("room-id", None)
         player_name = request.POST.get("player-name", "Unknown Player")
+        if player_name == "":
+            player_name = "Guest"
         if not re.match("^[a-zA-Z0-9]+$", player_name):
             messages.error(request, "Name should contain only alphabets and numbers.")
             return redirect("/")
-        if player_name == "":
-            player_name = "Guest"
+
 
         if(room_id):
             try:
@@ -38,18 +39,14 @@ def tic_tac(request, id=None, name=None):
         return redirect("/")
     return render(request, "tic_tac.html")
 
-def your_view(request):
-    # Your existing view code...
+# def your_view(request):
+#     # Your existing view code...
+#
+#     # Generate ranges
+#     rows = range(15)
+#     cols = range(20)
+#
+#     # Pass ranges to template (combine with existing context if any)
 
-    # Generate ranges
-    rows = range(15)
-    cols = range(20)
-
-    # Pass ranges to template (combine with existing context if any)
-    context = {
-        'rows': rows,
-        'cols': cols,
-        # Your existing context variables...
-    }
 
     return render(request, 'your_template.html', context)

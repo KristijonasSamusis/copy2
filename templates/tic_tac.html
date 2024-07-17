@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
 <style>
+    .info {
+        font-size: 2vw; /* Adjusts the font size based on the width of the viewport */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
     .details p {
 display: block;
@@ -68,25 +74,27 @@ opacity: 1;
 <body>
     <div class="wrapper">
         <div class="details">
-            <p>{{name}} <img id="playerSymbol" src="" style="width: 20px; height: 20px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-square" viewBox="0 0 16 16">
-  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-  <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
-</svg></p>
+            <p class="info">
+                <span>{{name}} <img id="playerSymbol" src="" style="width: 1.5vw; height: 1.5vw;"></span>
+                <span style="flex-grow: 1; text-align: center;">Room: {{room.id}}</span>
+                <span style="visibility: hidden;">{{name}}</span>
+            </p>
+            <p class="info">
+                <span id="playerXScore">Player X Score: 0</span>
+                <span id="turn" style="flex-grow: 1; text-align: center;"></span>
+                <span style="visibility: hidden;">{{name}}</span>
+            </p>
 
-            <p>Room: {{room.id}} </p>
-            <p id="playerXScore">Player X Score: 0</p>
-            <p id="playerOScore">Player O Score: 0</p>
-            <p id="opponent-txt"> Opponent (waiting to join)</p>
+            <p class="info" id="playerOScore">Player O Score: 0</p>
+
+            <p class="info" id="opponent-txt"> Opponent (waiting to join)</p>
+            <p class="info" id="turn"></p>
 
         </div>
         <div class="container">
  {% for num in "x"|rjust:"320" %}
     <div boxIndex="{{ forloop.counter0 }}" player="" class="box child box-{{ forloop.counter }}"></div>
 {% endfor %}
-        </div>
-        <div class="details">
-            <p id="turn"></p>
         </div>
     </div>
 
@@ -203,14 +211,20 @@ function addPlayerLetter(element, state=playerLetter) {
                 }).then( e => window.location = "/")
             }
             else if(data.event == "game_start"){
-                board = data.board
-                myTurn = data.myTurn
-                playerLetter = data.myTurn? "X": "O"
-                resetBoard()
-                turnElm.innerHTML = data.myTurn? "Your Turn": "Opponent's Turn"
-                opponentTxtElm.innerHTML = "Opponent Joined"
+                board = data.board;
+                myTurn = data.myTurn;
+                playerLetter = data.myTurn ? "X" : "O";
+                // Retrieve the img element
+                const playerSymbolImg = document.getElementById("playerSymbol");
+                // Set the src attribute based on playerLetter
+                const baseUrl = '/static/tic_tac/images/'; // Ensure this path is correct
+                playerSymbolImg.src = `${baseUrl}P${playerLetter}.png`;
+
+                resetBoard();
+                turnElm.innerHTML = myTurn ? "Your Turn" : "Opponent's Turn";
+                opponentTxtElm.innerHTML = "Opponent Joined";
                 setTimeout(() => {
-                Swal.close()
+                    Swal.close();
                 }, 500);
             }
             else if(data.event == "board_data_send"){
