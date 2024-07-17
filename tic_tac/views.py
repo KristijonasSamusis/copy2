@@ -33,13 +33,16 @@ def index(request):
 def tic_tac(request, id=None, name=None):
     try:
         room = Room.objects.get(id=id)
-        request.session['name'] = name
+        print("VARDAS", name)
         return render(request, "tic_tac.html", {"room": room, "name": name})
     except Room.DoesNotExist:
         messages.error(request, "Room does not exist!!!")
         return redirect("/")
     return render(request, "tic_tac.html")
 
+def tic_tac_name(request, id=None, name=None):
+    print("VARDASNAME", name)
+    return name
 # def your_view(request):
 #     # Your existing view code...
 #
@@ -50,4 +53,4 @@ def tic_tac(request, id=None, name=None):
 #     # Pass ranges to template (combine with existing context if any)
 
 
-    return render(request, 'your_template.html', context)
+    # return render(request, 'your_template.html', context)

@@ -52,6 +52,8 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
         if content['event'] == "board_data_send":
             self.clicked_key = content.get('clickedKey')
             self.letter = content.get('letter')
+            self.opponent = content.get('opponentName')
+            print("OPPONENT", self.opponent)
             self.score, board = check_win(content['board'], self.clicked_key, self.letter)
             if self.score > 0:
                 for channel_name in self.channel_layer.groups[self.group_name]:
@@ -62,6 +64,7 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                             "score": self.score,
                             "board": board,
                             "player": self.letter,
+                            "opponent": self.opponent,
                             "myTurn": False if self.channel_name == channel_name else True
 
                         }

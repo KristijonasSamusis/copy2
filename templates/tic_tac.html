@@ -113,7 +113,7 @@ opacity: 1;
             <p class="info textcontainer">
                 <span class="left">{{name}} </span>
                 <span class="center" style="flex-grow: 1; text-align: center;">Room: {{room.id}}</span>
-                <span class="right" >Opponent</span>
+                <span class="right" id="opponent"></span>
             </p>
             <p class="info textcontainer">
                 <span class="left" id="playerXScore">X Score: 0</span>
@@ -145,6 +145,8 @@ opacity: 1;
 let board = {};
 let playerXScore = 0;
 let playerOScore = 0;
+let opponentName = "{{name}}";
+
 for (let i = 0; i < 320; i++) {
   board[i] = '';
 
@@ -163,6 +165,7 @@ for (let i = 0; i < 320; i++) {
                         event: 'board_data_send',
                         board: board,
                         clickedKey: i,
+                        opponentName: opponentName,
                         letter: playerLetter,
 
                     }))
@@ -281,12 +284,15 @@ function addPlayerLetter(element, state=playerLetter) {
                 board = data.board
                 myTurn = data.myTurn
                 score = data.score
+                opponent = data.opponent
                 updateBoard(board)
                 turnElm.innerHTML = data.myTurn? "Your Turn": "Opponent's Turn"
+                document.getElementById("opponent").innerText = `${opponent}`
                 if(data.player == "X") {
                     playerXScore = playerXScore + score;
                     document.getElementById("playerXScore").innerText = `X Score: ${playerXScore}`;
-                } else if(data.player == "O") {
+                }
+                else if(data.player == "O") {
                     playerOScore = playerOScore + score;
                     document.getElementById("playerOScore").innerText = `O Score: ${playerOScore}`;
     }
