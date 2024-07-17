@@ -5,14 +5,33 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <title>Turn Based Games</title>
 
 
     <style>
-                body {
-            background-color: #f0f0f0;
-            font-family: 'Open Sans', sans-serif;
+        body {
+            height: 100vh;
+            margin: 0;
+            background-size: 3.3vmin 3.3vmin; /* Adjust this to match your preferred square size */
+            background-image:
+                linear-gradient(to right, grey 0px, transparent 0.5px),
+                linear-gradient(to bottom, grey 0px, transparent 0.5px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
+                h1 {
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            /* Adjust the font size based on viewport width */
+            font-size: calc(5.8vmin);
+            white-space: nowrap; /* Prevents the text from wrapping into multiple lines */
+            overflow: hidden; /* Both overflow and text-overflow prevents the text from spilling out */
+            text-overflow: ellipsis; /* replaces overflow with ... */
+        }
+
         .wrapper {
             width: 80%;
             margin: auto;
@@ -20,10 +39,13 @@
         .form input {
             margin: 10px 0;
         }
+
+
     </style>
 </head>
 
 <body>
+    <h1>TURN BASED GAMES</h1>
     <div class="wrapper">
         {% if messages %}
             <div class="messages">
