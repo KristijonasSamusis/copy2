@@ -4,6 +4,7 @@ import random
 from .helpers import check_win, is_draw
 
 
+
 class TicTacConsumer(AsyncJsonWebsocketConsumer):
 
     board = {i: '' for i in range(320)}
@@ -39,7 +40,6 @@ class TicTacConsumer(AsyncJsonWebsocketConsumer):
                     "data": {
                         "event": "game_start",
                         "board": self.board,
-                        "opponent": self.connected_players.get(channel_name),
                         "myTurn": True if i == 0 else False
                     }
                 })
