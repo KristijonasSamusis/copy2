@@ -1,34 +1,65 @@
-from django.shortcuts import render, HttpResponse, redirect
-from .models import Room
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+from .models import Room, Player
+from django.http import HttpResponse
 from django.contrib import messages
 import re
+from .forms import NameForm
 
 
-# Create your views here.
 def index(request):
-    if request.method == "GET":
-        return render(request, "index.html")
-    elif request.method == "POST":
+
+    form = NameForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            return redirect('create_room')
+    else:
+        pass
+
+
+    context = {
+        'rooms': Room.objects.all(),  # or however you are getting your rooms
+        'form': form,
+
+    }
+    print("Kambariai", Room.objects.all())
+    return render(request, "index.html", context)
+
+
+def create_room(request):
+    if request.method == 'POST':
+        form = NameForm(request.POST)
+        if form.is_valid():
+            player_name = form.cleaned_data['name']
+            # Assuming a room is created here for the player
+            room = Room.objects.create()  # Create a new room
+            Player.objects.create(name=player_name, room=room)
+        return redirect(f"/tic_tac/{room.id}/{player_name}/")
+    else:
+        form = NameForm()  # An unbound form
+    # if form is not valid, redirect to form page with error messages
+    return render(request, 'index.html', {'form': form})
+
+
+def join_room(request):
+    form = NameForm(request.POST or None)
+    if form.is_valid():
+        player_name = form.cleaned_data.get('name')
         room_id = request.POST.get("room-id", None)
-        player_name = request.POST.get("player-name", "Unknown Player")
-        if player_name == "":
-            player_name = "Guest"
-        if not re.match("^[a-zA-Z0-9]+$", player_name):
-            messages.error(request, "Name should contain only alphabets and numbers.")
-            return redirect("/")
-
-
-        if(room_id):
-            try:
-                room = Room.objects.get(id=room_id)
-                return redirect(f"/tic_tac/{room.id}/{player_name}/")
-            except Room.DoesNotExist:
-                messages.error(request, "Room does not exist.")
-                return redirect("/")
-        else:
-            room = Room.objects.create()
+        try:
+            room = Room.objects.get(id=room_id)
             return redirect(f"/tic_tac/{room.id}/{player_name}/")
-        return HttpResponse("post request handling")
+        except Room.DoesNotExist:
+            messages.error(request, "Room does not exist.")
+    # if form is not valid or room doesn’t exist, redirect appropriately
+    return redirect('/')
+
+
+def leave_room(request, player_id):
+    player = get_object_or_404(Player, id=player_id)
+    player.room = None  # remove player from old room
+    player.save()  # apply changes to the database
+    return HttpResponse("Player left the room successfully.")
+
 
 def tic_tac(request, id=None, name=None):
     try:
@@ -38,19 +69,8 @@ def tic_tac(request, id=None, name=None):
     except Room.DoesNotExist:
         messages.error(request, "Room does not exist!!!")
         return redirect("/")
-    return render(request, "tic_tac.html")
+
 
 def tic_tac_name(request, id=None, name=None):
     print("VARDASNAME", name)
     return name
-# def your_view(request):
-#     # Your existing view code...
-#
-#     # Generate ranges
-#     rows = range(15)
-#     cols = range(20)
-#
-#     # Pass ranges to template (combine with existing context if any)
-
-
-    # return render(request, 'your_template.html', context)
